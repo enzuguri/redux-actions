@@ -39,7 +39,7 @@ function composeSelectors(parentState, inputSelectors) {
 
 function autodux(
   { actions: userActions, initial },
-  { namespace, prefix } = {}
+  { namespace, prefix, slice } = {}
 ) {
   const { selectors, setterActions } = Object.keys(initial).reduce(
     initialStateReducer,
@@ -50,13 +50,16 @@ function autodux(
     ...userActions
   }).reduce(actionsReducer, { actionMap: {}, handlers: {} });
 
-  const actions = createActions(actionMap, { namespace, prefix });
+  const actions = createActions(slice ? { [slice]: actionMap } : actionMap, {
+    namespace,
+    prefix
+  });
   const reducer = handleActions(handlers, initial);
   return {
-    actions,
-    selectors: namespace ? composeSelectors(namespace, selectors) : selectors,
+    actions: slice ? actions[slice] : actions,
+    selectors: slice ? composeSelectors(slice, selectors) : selectors,
     reducer,
-    namespace,
+    slice,
     initial
   };
 }

@@ -21,17 +21,17 @@ test('does something great', () => {
 });
 
 test('uses namespace', () => {
-  const namespace = 'slice';
+  const slice = 'slice';
   const { actions, selectors, reducer } = autodux(
     { initial: state },
     {
-      namespace,
+      slice,
       prefix: 'my-company'
     }
   );
 
   const parentState = {
-    [namespace]: state
+    [slice]: state
   };
 
   const action = actions.setfoo('my message');
