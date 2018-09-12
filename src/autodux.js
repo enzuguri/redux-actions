@@ -21,6 +21,22 @@ function actionsReducer(result, [key, value]) {
   return result;
 }
 
+function selectorsReducer(result, [name, selector]) {
+  const parentState = result.parentState;
+  result[name] = ({ [parentState]: state }) => selector(state);
+  return result;
+}
+
+function composeSelectors(parentState, inputSelectors) {
+  const { parentState: _, ...selectors } = Object.entries(
+    inputSelectors
+  ).reduce(selectorsReducer, {
+    [`get${parentState}`]: ({ [parentState]: state }) => state,
+    parentState
+  });
+  return selectors;
+}
+
 function autodux(
   { actions: userActions, initial },
   { namespace, prefix } = {}
@@ -38,7 +54,7 @@ function autodux(
   const reducer = handleActions(handlers, initial);
   return {
     actions,
-    selectors,
+    selectors: namespace ? composeSelectors(namespace, selectors) : selectors,
     reducer,
     namespace,
     initial
